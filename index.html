@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.5">
+<title>Mon Salaire - v7.0</title>
+<!-- Bibliothèques externes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- CSS Modules -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="css/topbar.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/views.css">
+<link rel="stylesheet" href="css/fiche-templates.css">
+<link rel="stylesheet" href="css/modals.css">
+<link rel="stylesheet" href="css/dark-mode.css">
+</head>
+<body>
+
+<!-- ============ LOGIN OVERLAY ============ -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-card" id="setupCard" style="display:none;">
+        <div class="logo-big"><i class="fas fa-shield-alt"></i></div>
+        <h1>Configurer l'accès</h1>
+        <div class="sub">Créez un code PIN à 6 chiffres</div>
+        <div class="setup-inputs">
+            <label>Nouveau code PIN</label>
+            <input type="tel" id="setupPin1" maxlength="6" inputmode="numeric" placeholder="••••••">
+            <label>Confirmez le code PIN</label>
+            <input type="tel" id="setupPin2" maxlength="6" inputmode="numeric" placeholder="••••••">
+            <div class="pin-strength" id="pinStrength"></div>
+        </div>
+        <button class="btn-login" onclick="setupPin()"><i class="fas fa-check-circle"></i> Créer mon code PIN</button>
+        <div class="pin-error-msg" id="setupError"></div>
+        <div class="login-hint"><i class="fas fa-info-circle"></i> Conservez ce code précieusement.</div>
+    </div>
+    <div class="login-card" id="loginCard" style="display:none;">
+        <div class="logo-big"><i class="fas fa-lock"></i></div>
+        <h1>Mon Salaire</h1>
+        <div class="sub">Entrez votre code PIN</div>
+        <div class="pin-display" id="pinDisplay">
+            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+        </div>
+        <div class="pin-pad">
+            <button class="pin-btn" onclick="pinPress('1')">1</button>
+            <button class="pin-btn" onclick="pinPress('2')">2</button>
+            <button class="pin-btn" onclick="pinPress('3')">3</button>
+            <button class="pin-btn" onclick="pinPress('4')">4</button>
+            <button class="pin-btn" onclick="pinPress('5')">5</button>
+            <button class="pin-btn" onclick="pinPress('6')">6</button>
+            <button class="pin-btn" onclick="pinPress('7')">7</button>
+            <button class="pin-btn" onclick="pinPress('8')">8</button>
+            <button class="pin-btn" onclick="pinPress('9')">9</button>
+            <button class="pin-btn pin-action" onclick="pinClear()"><i class="fas fa-times"></i></button>
+            <button class="pin-btn" onclick="pinPress('0')">0</button>
+            <button class="pin-btn pin-action" onclick="pinDelete()"><i class="fas fa-backspace"></i></button>
+        </div>
+        <div class="pin-error-msg" id="loginError"></div>
+        <div class="login-hint"><i class="fas fa-info-circle"></i> Session : <strong id="sessionDuration">30 min</strong></div>
+    </div>
+</div>
+
+<!-- ============ APPLICATION ============ -->
+<div class="app" id="appContent" style="display:none;">
+    <div class="topbar">
+        <div class="logo"><i class="fas fa-calculator"></i> Mon<span>Salaire</span></div>
+        <div class="topbar-center">
+            <button class="entreprise-selector" id="entrepriseSelector" onclick="openEntrepriseModal()">
+                <i class="fas fa-building"></i>
+                <span id="currentEntrepriseName">Aucune entreprise</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="topbar-actions">
+            <button class="btn-search" onclick="openGlobalSearch()" title="Recherche"><i class="fas fa-search"></i></button>
+            <button class="btn-theme" id="themeToggle" onclick="toggleTheme()" title="Mode sombre"><i class="fas fa-moon"></i></button>
+            <span class="badge-session" id="sessionBadge"><i class="fas fa-clock"></i> <span id="sessionTimer">30:00</span></span>
+            <i class="fas fa-lock" onclick="lockNow()" style="cursor:pointer;" title="Verrouiller"></i>
+            <i class="fas fa-cog" onclick="switchTab('params')" style="cursor:pointer;" title="Paramètres"></i>
+        </div>
+    </div>
+
+    <div class="nav-tabs" id="navTabs">
+        <!-- Les onglets sont injectés par JS -->
+    </div>
+
+    <div class="content" id="contentContainer">
+        <!-- Les vues sont injectées par JS -->
+    </div>
+
+    <div id="toast" class="toast">✅ Sauvegardé</div>
+</div>
+
+<!-- ============ MODALS ============ -->
+<div id="modalsContainer">
+    <!-- Les modals sont injectés par JS -->
+</div>
+
+<!-- ============ SCRIPTS ============ -->
+<!-- Core -->
+<script src="js/01-config.js"></script>
+<script src="js/02-state.js"></script>
+<script src="js/03-utils.js"></script>
+<script src="js/04-storage.js"></script>
+<script src="js/05-theme.js"></script>
+<script src="js/06-auth.js"></script>
+<script src="js/07-calcul.js"></script>
+<!-- Vues (templates HTML) -->
+<script src="js/views/nav.js"></script>
+<script src="js/views/modals.js"></script>
+<script src="js/views/dashboard.js"></script>
+<script src="js/views/salaries.js"></script>
+<script src="js/views/absences.js"></script>
+<script src="js/views/calculs.js"></script>
+<script src="js/views/registre.js"></script>
+<script src="js/views/archives.js"></script>
+<script src="js/views/studio.js"></script>
+<script src="js/views/aide.js"></script>
+<script src="js/views/params.js"></script>
+<!-- Modules métier -->
+<script src="js/08-entreprises.js"></script>
+<script src="js/09-salaries.js"></script>
+<script src="js/10-absences.js"></script>
+<script src="js/11-registre.js"></script>
+<script src="js/12-archives.js"></script>
+<script src="js/13-pdf.js"></script>
+<script src="js/14-studio.js"></script>
+<script src="js/15-dashboard.js"></script>
+<script src="js/16-aide.js"></script>
+<script src="js/17-params.js"></script>
+<script src="js/18-navigation.js"></script>
+<script src="js/19-init.js"></script>
+</body>
+</html>
